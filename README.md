@@ -99,17 +99,26 @@ npm run build
 
 ---
 
-# Feedback
+# Reviews & Feedback
 
-This project was built for personal workflow management.
+I built this primarily for my own workflow as a freelancer and job seeker, so I’m sharing it publicly to get honest feedback and improvement ideas.
 
-Would love feedback, suggestions, and improvement ideas from:
-- developers
-- designers
-- productivity enthusiasts
-- recruiters
-- startup operators
+Would especially appreciate reviews on:
 
+- UI/UX experience
+- Workflow practicality
+- Performance
+- Features you’d personally want
+- Bugs/issues
+- General usability
+
+Feel free to:
+- Open an issue
+- Suggest features
+- Share improvements
+- Test the workflow and break things 😄
+
+Any feedback is genuinely appreciated.
 ---
 
 # License
