@@ -24,11 +24,10 @@ Built with Electron + React + Vite.
 
 ---
 
-# Screenshots
-
 ## Dashboard
 
-(Add your screenshots here later)
+(<img width="1281" height="800" alt="image" src="https://github.com/user-attachments/assets/f5579392-1877-452c-bae5-c941b4ef4b85" />
+)
 
 ---
 
@@ -60,8 +59,7 @@ https://nodejs.org/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-cd YOUR_REPO
+git clone https://github.com/MehulS10/All-in-one-personal-tracker.git
 ```
 
 ---
