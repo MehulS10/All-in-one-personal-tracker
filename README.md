@@ -50,6 +50,8 @@ Built with Electron + React + Vite.
 
 # Installation & Running Locally
 
+windows application 
+
 ## Prerequisites
 
 Make sure you have installed:
