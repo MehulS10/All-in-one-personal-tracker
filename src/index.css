@@ -600,6 +600,14 @@ body {
   animation: slideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.modal-content > form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
