@@ -1,16 +1,128 @@
-# React + Vite
+# Omnitrack is a personal workspace app I vibe-coded for myself to manage job applications, freelance leads, projects, and daily work in one place.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An offline-first personal workspace for:
 
-Currently, two official plugins are available:
+- Job tracking
+- Leads CRM
+- Notes
+- Project management
+- Daily workflow organization
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Built with Electron + React + Vite.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Features
 
-## Expanding the ESLint configuration
+- Job application pipeline
+- Leads CRM
+- Workspace notes
+- Project tracking
+- Offline database support
+- Global activity feed
+- Fast desktop UI
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Dashboard
+
+<img width="1920" height="1080" alt="Screenshot (336)" src="https://github.com/user-attachments/assets/45f601b8-b779-4fae-8e01-899d47731f4b" />
+
+<img width="1920" height="1080" alt="Screenshot (337)" src="https://github.com/user-attachments/assets/142a1602-50ac-4e02-8b1c-772612e7cabc" />
+
+<img width="1920" height="1080" alt="Screenshot (338)" src="https://github.com/user-attachments/assets/33bc9cf7-dbac-4e6a-8487-e97d767b997e" />
+
+<img width="1920" height="1080" alt="Screenshot (339)" src="https://github.com/user-attachments/assets/5f1aa12e-04e1-45ef-b537-596ffb7b968c" />
+
+<img width="1920" height="1080" alt="Screenshot (340)" src="https://github.com/user-attachments/assets/c55fc536-5744-4c82-be60-d680d8051784" />
+
+---
+
+# Tech Stack
+
+- Electron
+- React
+- Vite
+- Tailwind CSS
+- Local Database
+
+---
+
+# Installation & Running Locally
+
+windows application 
+
+## Prerequisites
+
+Make sure you have installed:
+
+- Node.js
+- npm
+
+Download Node.js here:
+
+https://nodejs.org/
+
+---
+
+## Clone Repository
+
+```bash
+git clone https://github.com/MehulS10/All-in-one-personal-tracker.git
+```
+
+---
+
+## Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## Run Application
+
+```bash
+npm run dev
+```
+
+This will start:
+- Vite development server
+- Electron desktop application
+
+---
+
+# Build Application
+
+```bash
+npm run build
+```
+
+---
+
+# Reviews & Feedback
+
+I built this primarily for my own workflow as a freelancer and job seeker, so I’m sharing it publicly to get honest feedback and improvement ideas.
+
+Would especially appreciate reviews on:
+
+- UI/UX experience
+- Workflow practicality
+- Performance
+- Features you’d personally want
+- Bugs/issues
+- General usability
+
+Feel free to:
+- Open an issue
+- Suggest features
+- Share improvements
+- Test the workflow and break things 😄
+
+Any feedback is genuinely appreciated.
+---
+
+# License
+
+MIT
