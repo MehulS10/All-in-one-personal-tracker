@@ -84,7 +84,7 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
     followUpDate: 120,
     interviewDate: 120,
     salary: 100,
-    contactPerson: 140
+    location: 130
   });
   const [resizingCol, setResizingCol] = useState(null);
 
@@ -889,9 +889,9 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
                         Salary<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('salary')}</span>
                         <div className={`resize-handle ${resizingCol === 'salary' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'salary')} onClick={(e) => e.stopPropagation()} />
                       </th>
-                      <th style={{ width: colWidths.contactPerson, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('contactPerson')}>
-                        Contact Person<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('contactPerson')}</span>
-                        <div className={`resize-handle ${resizingCol === 'contactPerson' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'contactPerson')} onClick={(e) => e.stopPropagation()} />
+                      <th style={{ width: colWidths.location, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('location')}>
+                        Location<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('location')}</span>
+                        <div className={`resize-handle ${resizingCol === 'location' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'location')} onClick={(e) => e.stopPropagation()} />
                       </th>
                     </tr>
                   </thead>
@@ -944,7 +944,7 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
                           <td style={{ padding: cellPadding, width: colWidths.followUpDate, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.followUpDate || '—'}</td>
                           <td style={{ padding: cellPadding, width: colWidths.interviewDate, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.interviewDate || '—'}</td>
                           <td style={{ padding: cellPadding, width: colWidths.salary, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.salary || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.contactPerson, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.contactPerson || '—'}</td>
+                          <td style={{ padding: cellPadding, width: colWidths.location, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.location || '—'}</td>
                         </tr>
                       );
                     })}
