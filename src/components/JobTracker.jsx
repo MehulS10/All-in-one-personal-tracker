@@ -834,7 +834,7 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
           )}
 
           {/* Filters Bar */}
-          <div className="glass-card" style={{ padding: '16px', display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="glass-card" style={{ padding: '16px', display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center', position: 'relative', zIndex: 10 }}>
             <div style={{ position: 'relative', flexGrow: 1, minWidth: '200px' }}>
               <Search size={18} style={{ position: 'absolute', left: '12px', top: '11px', color: 'var(--text-muted)' }} />
               <input 
