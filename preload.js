@@ -22,4 +22,8 @@ contextBridge.exposeInMainWorld('api', {
   saveDialog: (options) => ipcRenderer.invoke('save-dialog', options),
   writeFileBinary: (filePath, base64Data) => ipcRenderer.invoke('write-file-binary', filePath, base64Data),
   writeFileText: (filePath, textData) => ipcRenderer.invoke('write-file-text', filePath, textData),
+
+  // Synchronous dialog overrides
+  showAlert: (message, title) => ipcRenderer.sendSync('show-alert-sync', { message, title }),
+  showConfirm: (message, title) => ipcRenderer.sendSync('show-confirm-sync', { message, title }),
 });

@@ -270,3 +270,27 @@ ipcMain.handle('write-file-text', async (event, filePath, textData) => {
     return { success: false, error: error.message };
   }
 });
+
+// IPC Handler - Native dialog sync alert override (fixes Windows focus loss bug)
+ipcMain.on('show-alert-sync', (event, { message, title }) => {
+  dialog.showMessageBoxSync(mainWindow, {
+    type: 'info',
+    buttons: ['OK'],
+    title: title || 'System Notification',
+    message: message
+  });
+  event.returnValue = null;
+});
+
+// IPC Handler - Native dialog sync confirm override (fixes Windows focus loss bug)
+ipcMain.on('show-confirm-sync', (event, { message, title }) => {
+  const result = dialog.showMessageBoxSync(mainWindow, {
+    type: 'question',
+    buttons: ['Cancel', 'OK'],
+    defaultId: 1,
+    cancelId: 0,
+    title: title || 'Confirmation Required',
+    message: message
+  });
+  event.returnValue = (result === 1);
+});
