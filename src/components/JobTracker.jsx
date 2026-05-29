@@ -173,6 +173,44 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
   const [contactPerson, setContactPerson] = useState('');
   const [attachments, setAttachments] = useState([]);
 
+  const [isScraping, setIsScraping] = useState(false);
+
+  // Link Scraper pre-fill engine for Job Details modal
+  const handleFetchJobInfo = async () => {
+    if (!url) {
+      alert('Please paste a job link first in the Job Posting URL field!');
+      return;
+    }
+    setIsScraping(true);
+    try {
+      const res = await window.api.scrapeLink(url);
+      if (res && !res.error) {
+        if (res.title) {
+          setTitle(prev => prev ? prev : res.title);
+        }
+        if (res.hostname && !company) {
+          const parts = res.hostname.split('.');
+          const part = parts[0] === 'www' ? parts[1] : parts[0];
+          setCompany(part.charAt(0).toUpperCase() + part.slice(1));
+        }
+        if (res.hostname && !applySite) {
+          const parts = res.hostname.split('.');
+          const domain = parts[0] === 'www' ? parts[1] : parts[0];
+          setApplySite(domain.charAt(0).toUpperCase() + domain.slice(1));
+        }
+        if (res.description && !description) {
+          setDescription(res.description);
+        }
+      } else {
+        alert(`Could not extract page info: ${res.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      alert(`Scraper error: ${err.message}`);
+    } finally {
+      setIsScraping(false);
+    }
+  };
+
   // Timeline Event inputs
   const [eventText, setEventText] = useState('');
   const [eventDate, setEventDate] = useState('');
@@ -1392,13 +1430,25 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
                   </div>
                   <div className="form-group">
                     <label className="form-label">Job Posting URL (JD Link)</label>
-                    <input 
-                      type="url" 
-                      className="form-input" 
-                      placeholder="e.g. https://wellfound.com/..."
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                    />
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input 
+                        type="url" 
+                        className="form-input" 
+                        placeholder="e.g. https://wellfound.com/..."
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        style={{ flexGrow: 1 }}
+                      />
+                      <button 
+                        type="button" 
+                        className="btn btn-secondary" 
+                        style={{ flexShrink: 0, padding: '10px 14px' }}
+                        onClick={handleFetchJobInfo}
+                        disabled={isScraping}
+                      >
+                        {isScraping ? 'Scraping...' : 'Fetch Info'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
