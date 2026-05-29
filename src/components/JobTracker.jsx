@@ -22,8 +22,10 @@ import {
   Globe,
   User,
   FileSpreadsheet,
-  FileText
+  FileText,
+  Settings
 } from 'lucide-react';
+
 
 const isPlaceholder = (val) => {
   if (!val) return true;
@@ -86,6 +88,48 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
     salary: 100,
     location: 130
   });
+  // Column Visibility state
+  const [visibleCols, setVisibleCols] = useState(() => {
+    const saved = localStorage.getItem('jobs_visible_cols');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return {
+      company: true,
+      title: true,
+      dateApplied: true,
+      applySite: true,
+      url: true,
+      status: true,
+      followUpDate: true,
+      interviewDate: true,
+      salary: true,
+      location: true
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('jobs_visible_cols', JSON.stringify(visibleCols));
+  }, [visibleCols]);
+
+  const [showColPicker, setShowColPicker] = useState(false);
+
+  const toColumnLabel = (key) => {
+    switch (key) {
+      case 'company': return 'Company';
+      case 'title': return 'Job Position';
+      case 'dateApplied': return 'Date Applied';
+      case 'applySite': return 'Apply Site';
+      case 'url': return 'JD Link';
+      case 'status': return 'Status';
+      case 'followUpDate': return 'Follow Up Date';
+      case 'interviewDate': return 'Interview Date';
+      case 'salary': return 'Salary';
+      case 'location': return 'Location';
+      default: return key;
+    }
+  };
+
   const [resizingCol, setResizingCol] = useState(null);
 
   const startResize = (e, colKey) => {
@@ -833,6 +877,56 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
                 <option value="cozy">Tall</option>
               </select>
             </div>
+
+            {/* Column Selector */}
+            <div style={{ position: 'relative' }}>
+              <button 
+                type="button"
+                className="btn btn-secondary" 
+                onClick={() => setShowColPicker(!showColPicker)}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px' }}
+              >
+                <Settings size={14} /> Columns
+              </button>
+              
+              {showColPicker && (
+                <>
+                  <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 90 }} onClick={() => setShowColPicker(false)} />
+                  <div 
+                    className="glass-card" 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '44px', 
+                      right: 0, 
+                      zIndex: 100, 
+                      minWidth: '190px', 
+                      padding: '16px', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '10px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      boxShadow: 'var(--shadow-md)',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>
+                      Show/Hide Columns
+                    </span>
+                    {Object.keys(visibleCols).map(colKey => (
+                      <label key={colKey} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={visibleCols[colKey]}
+                          onChange={(e) => setVisibleCols(prev => ({ ...prev, [colKey]: e.target.checked }))}
+                        />
+                        {toColumnLabel(colKey)}
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Applications list */}
@@ -853,46 +947,66 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
                           onChange={handleSelectAllJobs}
                         />
                       </th>
-                      <th style={{ width: colWidths.company, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('company')}>
-                        Company<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('company')}</span>
-                        <div className={`resize-handle ${resizingCol === 'company' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'company')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.title, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('title')}>
-                        Job Position<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('title')}</span>
-                        <div className={`resize-handle ${resizingCol === 'title' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'title')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.dateApplied, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('dateApplied')}>
-                        Date Applied<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('dateApplied')}</span>
-                        <div className={`resize-handle ${resizingCol === 'dateApplied' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'dateApplied')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.applySite, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('applySite')}>
-                        Apply Site<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('applySite')}</span>
-                        <div className={`resize-handle ${resizingCol === 'applySite' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'applySite')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.url, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('url')}>
-                        JD Link<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('url')}</span>
-                        <div className={`resize-handle ${resizingCol === 'url' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'url')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.status, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('status')}>
-                        Status<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('status')}</span>
-                        <div className={`resize-handle ${resizingCol === 'status' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'status')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.followUpDate, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('followUpDate')}>
-                        Follow Up Date<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('followUpDate')}</span>
-                        <div className={`resize-handle ${resizingCol === 'followUpDate' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'followUpDate')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.interviewDate, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('interviewDate')}>
-                        Interview Date<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('interviewDate')}</span>
-                        <div className={`resize-handle ${resizingCol === 'interviewDate' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'interviewDate')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.salary, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('salary')}>
-                        Salary<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('salary')}</span>
-                        <div className={`resize-handle ${resizingCol === 'salary' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'salary')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.location, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('location')}>
-                        Location<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('location')}</span>
-                        <div className={`resize-handle ${resizingCol === 'location' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'location')} onClick={(e) => e.stopPropagation()} />
-                      </th>
+                      {visibleCols.company && (
+                        <th style={{ width: colWidths.company, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('company')}>
+                          Company<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('company')}</span>
+                          <div className={`resize-handle ${resizingCol === 'company' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'company')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.title && (
+                        <th style={{ width: colWidths.title, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('title')}>
+                          Job Position<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('title')}</span>
+                          <div className={`resize-handle ${resizingCol === 'title' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'title')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.dateApplied && (
+                        <th style={{ width: colWidths.dateApplied, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('dateApplied')}>
+                          Date Applied<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('dateApplied')}</span>
+                          <div className={`resize-handle ${resizingCol === 'dateApplied' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'dateApplied')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.applySite && (
+                        <th style={{ width: colWidths.applySite, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('applySite')}>
+                          Apply Site<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('applySite')}</span>
+                          <div className={`resize-handle ${resizingCol === 'applySite' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'applySite')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.url && (
+                        <th style={{ width: colWidths.url, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('url')}>
+                          JD Link<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('url')}</span>
+                          <div className={`resize-handle ${resizingCol === 'url' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'url')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.status && (
+                        <th style={{ width: colWidths.status, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('status')}>
+                          Status<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('status')}</span>
+                          <div className={`resize-handle ${resizingCol === 'status' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'status')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.followUpDate && (
+                        <th style={{ width: colWidths.followUpDate, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('followUpDate')}>
+                          Follow Up Date<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('followUpDate')}</span>
+                          <div className={`resize-handle ${resizingCol === 'followUpDate' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'followUpDate')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.interviewDate && (
+                        <th style={{ width: colWidths.interviewDate, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('interviewDate')}>
+                          Interview Date<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('interviewDate')}</span>
+                          <div className={`resize-handle ${resizingCol === 'interviewDate' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'interviewDate')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.salary && (
+                        <th style={{ width: colWidths.salary, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('salary')}>
+                          Salary<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('salary')}</span>
+                          <div className={`resize-handle ${resizingCol === 'salary' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'salary')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.location && (
+                        <th style={{ width: colWidths.location, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('location')}>
+                          Location<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('location')}</span>
+                          <div className={`resize-handle ${resizingCol === 'location' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'location')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -921,30 +1035,50 @@ export default function JobTracker({ selectedJobId, setSelectedJobId }) {
                               onChange={(e) => handleToggleSelect(e, j.id)}
                             />
                           </td>
-                          <td style={{ fontWeight: '600', padding: cellPadding, width: colWidths.company, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.company}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.title, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.title}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.dateApplied, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.dateApplied}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.applySite, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.applySite || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.url }}>
-                            {j.url ? (
-                              <a 
-                                href={j.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                onClick={(e) => e.stopPropagation()} 
-                                style={{ color: 'var(--accent-primary)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '2px' }}
-                              >
-                                JD <ExternalLink size={10} />
-                              </a>
-                            ) : '—'}
-                          </td>
-                          <td style={{ padding: cellPadding, width: colWidths.status }}>
-                            <span className={`badge ${badgeClass}`}>{j.status}</span>
-                          </td>
-                          <td style={{ padding: cellPadding, width: colWidths.followUpDate, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.followUpDate || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.interviewDate, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.interviewDate || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.salary, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.salary || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.location, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.location || '—'}</td>
+                          {visibleCols.company && (
+                            <td style={{ fontWeight: '600', padding: cellPadding, width: colWidths.company, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.company}</td>
+                          )}
+                          {visibleCols.title && (
+                            <td style={{ padding: cellPadding, width: colWidths.title, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.title}</td>
+                          )}
+                          {visibleCols.dateApplied && (
+                            <td style={{ padding: cellPadding, width: colWidths.dateApplied, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.dateApplied}</td>
+                          )}
+                          {visibleCols.applySite && (
+                            <td style={{ padding: cellPadding, width: colWidths.applySite, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.applySite || '—'}</td>
+                          )}
+                          {visibleCols.url && (
+                            <td style={{ padding: cellPadding, width: colWidths.url }}>
+                              {j.url ? (
+                                <a 
+                                  href={j.url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  onClick={(e) => e.stopPropagation()} 
+                                  style={{ color: 'var(--accent-primary)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '2px' }}
+                                >
+                                  JD <ExternalLink size={10} />
+                                </a>
+                              ) : '—'}
+                            </td>
+                          )}
+                          {visibleCols.status && (
+                            <td style={{ padding: cellPadding, width: colWidths.status }}>
+                              <span className={`badge ${badgeClass}`}>{j.status}</span>
+                            </td>
+                          )}
+                          {visibleCols.followUpDate && (
+                            <td style={{ padding: cellPadding, width: colWidths.followUpDate, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.followUpDate || '—'}</td>
+                          )}
+                          {visibleCols.interviewDate && (
+                            <td style={{ padding: cellPadding, width: colWidths.interviewDate, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.interviewDate || '—'}</td>
+                          )}
+                          {visibleCols.salary && (
+                            <td style={{ padding: cellPadding, width: colWidths.salary, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.salary || '—'}</td>
+                          )}
+                          {visibleCols.location && (
+                            <td style={{ padding: cellPadding, width: colWidths.location, overflow: 'hidden', textOverflow: 'ellipsis' }}>{j.location || '—'}</td>
+                          )}
                         </tr>
                       );
                     })}

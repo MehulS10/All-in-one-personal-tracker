@@ -104,6 +104,44 @@ export default function LeadsTracker({ selectedLeadId, setSelectedLeadId }) {
     setSortConfig({ key, direction });
   };
 
+  // Column Visibility state
+  const [visibleCols, setVisibleCols] = useState(() => {
+    const saved = localStorage.getItem('leads_visible_cols');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return {
+      name: true,
+      type: true,
+      phone: true,
+      email: true,
+      website: true,
+      company: true,
+      value: true,
+      status: true
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('leads_visible_cols', JSON.stringify(visibleCols));
+  }, [visibleCols]);
+
+  const [showColPicker, setShowColPicker] = useState(false);
+
+  const toColumnLabel = (key) => {
+    switch (key) {
+      case 'name': return 'Name';
+      case 'type': return 'Type';
+      case 'phone': return 'Mobile Number';
+      case 'email': return 'Email';
+      case 'website': return 'Website';
+      case 'company': return 'Company';
+      case 'value': return 'Value';
+      case 'status': return 'Status';
+      default: return key;
+    }
+  };
+
   // Row Density & Column Width Resizing states
   const [rowDensity, setRowDensity] = useState('medium'); // 'compact', 'medium', 'cozy'
   const [colWidths, setColWidths] = useState({
@@ -895,6 +933,56 @@ export default function LeadsTracker({ selectedLeadId, setSelectedLeadId }) {
                 <option value="cozy">Tall</option>
               </select>
             </div>
+
+            {/* Column Selector */}
+            <div style={{ position: 'relative' }}>
+              <button 
+                type="button"
+                className="btn btn-secondary" 
+                onClick={() => setShowColPicker(!showColPicker)}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px' }}
+              >
+                <Settings size={14} /> Columns
+              </button>
+              
+              {showColPicker && (
+                <>
+                  <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 90 }} onClick={() => setShowColPicker(false)} />
+                  <div 
+                    className="glass-card" 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '44px', 
+                      right: 0, 
+                      zIndex: 100, 
+                      minWidth: '190px', 
+                      padding: '16px', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '10px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      boxShadow: 'var(--shadow-md)',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>
+                      Show/Hide Columns
+                    </span>
+                    {Object.keys(visibleCols).map(colKey => (
+                      <label key={colKey} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}>
+                        <input 
+                          type="checkbox" 
+                          checked={visibleCols[colKey]}
+                          onChange={(e) => setVisibleCols(prev => ({ ...prev, [colKey]: e.target.checked }))}
+                        />
+                        {toColumnLabel(colKey)}
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Workspace Folders Header Card Grid */}
@@ -998,38 +1086,54 @@ export default function LeadsTracker({ selectedLeadId, setSelectedLeadId }) {
                           onChange={handleSelectAllLeads}
                         />
                       </th>
-                      <th style={{ width: colWidths.name, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('name')}>
-                        Name<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('name')}</span>
-                        <div className={`resize-handle ${resizingCol === 'name' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'name')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.type, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('type')}>
-                        Type<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('type')}</span>
-                        <div className={`resize-handle ${resizingCol === 'type' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'type')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.phone, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('phone')}>
-                        Mobile Number<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('phone')}</span>
-                        <div className={`resize-handle ${resizingCol === 'phone' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'phone')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.email, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('email')}>
-                        Email<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('email')}</span>
-                        <div className={`resize-handle ${resizingCol === 'email' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'email')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.website, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('link')}>
-                        Website<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('link')}</span>
-                        <div className={`resize-handle ${resizingCol === 'website' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'website')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.company, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('company')}>
-                        Company<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('company')}</span>
-                        <div className={`resize-handle ${resizingCol === 'company' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'company')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.value, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('value')}>
-                        Value<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('value')}</span>
-                        <div className={`resize-handle ${resizingCol === 'value' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'value')} onClick={(e) => e.stopPropagation()} />
-                      </th>
-                      <th style={{ width: colWidths.status, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('status')}>
-                        Status<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('status')}</span>
-                        <div className={`resize-handle ${resizingCol === 'status' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'status')} onClick={(e) => e.stopPropagation()} />
-                      </th>
+                      {visibleCols.name && (
+                        <th style={{ width: colWidths.name, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('name')}>
+                          Name<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('name')}</span>
+                          <div className={`resize-handle ${resizingCol === 'name' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'name')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.type && (
+                        <th style={{ width: colWidths.type, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('type')}>
+                          Type<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('type')}</span>
+                          <div className={`resize-handle ${resizingCol === 'type' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'type')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.phone && (
+                        <th style={{ width: colWidths.phone, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('phone')}>
+                          Mobile Number<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('phone')}</span>
+                          <div className={`resize-handle ${resizingCol === 'phone' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'phone')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.email && (
+                        <th style={{ width: colWidths.email, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('email')}>
+                          Email<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('email')}</span>
+                          <div className={`resize-handle ${resizingCol === 'email' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'email')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.website && (
+                        <th style={{ width: colWidths.website, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('link')}>
+                          Website<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('link')}</span>
+                          <div className={`resize-handle ${resizingCol === 'website' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'website')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.company && (
+                        <th style={{ width: colWidths.company, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('company')}>
+                          Company<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('company')}</span>
+                          <div className={`resize-handle ${resizingCol === 'company' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'company')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.value && (
+                        <th style={{ width: colWidths.value, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('value')}>
+                          Value<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('value')}</span>
+                          <div className={`resize-handle ${resizingCol === 'value' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'value')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
+                      {visibleCols.status && (
+                        <th style={{ width: colWidths.status, position: 'relative', cursor: 'pointer' }} onClick={() => requestSort('status')}>
+                          Status<span style={{ fontSize: '10px', color: 'var(--accent-primary)' }}>{getSortIndicator('status')}</span>
+                          <div className={`resize-handle ${resizingCol === 'status' ? 'active' : ''}`} onMouseDown={(e) => startResize(e, 'status')} onClick={(e) => e.stopPropagation()} />
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -1058,30 +1162,46 @@ export default function LeadsTracker({ selectedLeadId, setSelectedLeadId }) {
                               onChange={(e) => handleToggleSelect(e, l.id)}
                             />
                           </td>
-                          <td style={{ fontWeight: '600', padding: cellPadding, width: colWidths.name, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.name}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.type, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.type || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.phone, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.phone || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.email, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.email || '—'}</td>
-                          <td style={{ padding: cellPadding, width: colWidths.website }}>
-                            {l.link ? (
-                              <a 
-                                href={l.link} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                onClick={(e) => e.stopPropagation()} 
-                                style={{ color: 'var(--accent-primary)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '2px' }}
-                              >
-                                Site <ExternalLink size={10} style={{ display: 'inline' }} />
-                              </a>
-                            ) : '—'}
-                          </td>
-                          <td style={{ padding: cellPadding, width: colWidths.company, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.company || '—'}</td>
-                          <td style={{ fontWeight: '700', color: 'var(--accent-primary)', padding: cellPadding, width: colWidths.value }}>
-                            {l.value ? `$${l.value.toLocaleString()}` : '—'}
-                          </td>
-                          <td style={{ padding: cellPadding, width: colWidths.status }}>
-                            <span className={`badge ${badgeClass}`}>{l.status}</span>
-                          </td>
+                          {visibleCols.name && (
+                            <td style={{ fontWeight: '600', padding: cellPadding, width: colWidths.name, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.name}</td>
+                          )}
+                          {visibleCols.type && (
+                            <td style={{ padding: cellPadding, width: colWidths.type, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.type || '—'}</td>
+                          )}
+                          {visibleCols.phone && (
+                            <td style={{ padding: cellPadding, width: colWidths.phone, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.phone || '—'}</td>
+                          )}
+                          {visibleCols.email && (
+                            <td style={{ padding: cellPadding, width: colWidths.email, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.email || '—'}</td>
+                          )}
+                          {visibleCols.website && (
+                            <td style={{ padding: cellPadding, width: colWidths.website }}>
+                              {l.link ? (
+                                <a 
+                                  href={l.link} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  onClick={(e) => e.stopPropagation()} 
+                                  style={{ color: 'var(--accent-primary)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: '2px' }}
+                                >
+                                  Site <ExternalLink size={10} style={{ display: 'inline' }} />
+                                </a>
+                              ) : '—'}
+                            </td>
+                          )}
+                          {visibleCols.company && (
+                            <td style={{ padding: cellPadding, width: colWidths.company, overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.company || '—'}</td>
+                          )}
+                          {visibleCols.value && (
+                            <td style={{ fontWeight: '700', color: 'var(--accent-primary)', padding: cellPadding, width: colWidths.value }}>
+                              {l.value ? `$${l.value.toLocaleString()}` : '—'}
+                            </td>
+                          )}
+                          {visibleCols.status && (
+                            <td style={{ padding: cellPadding, width: colWidths.status }}>
+                              <span className={`badge ${badgeClass}`}>{l.status}</span>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
